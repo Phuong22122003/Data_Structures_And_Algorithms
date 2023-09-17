@@ -7,6 +7,8 @@
 #include <fstream>
 #include <conio.h>
 #include <Windows.h>
+#include<time.h>
+#include<stdlib.h>
 using namespace std;
 //***************************************************************************************************//
 template <typename T>
@@ -124,6 +126,7 @@ int InsertToBalance(ID *&root, int min, int max, ofstream &file)
         root = new ID;
         root->id = (min + max) / 2;
         root->left = root->right = NULL;
+        //truong hop min=max là nút cuối ko chèn vào nút đó nữa nên ko lo trùng ID
         // Insert(root,(min+max)/2);
         file << (min + max) / 2 << endl;
         return 1;
@@ -132,12 +135,12 @@ int InsertToBalance(ID *&root, int min, int max, ofstream &file)
     {
         if (numNode(root->left) == numNode(root->right))
         {
-            max = root->id;
+            max = root->id-1;
             InsertToBalance(root->left, min, max, file);
         }
         else
         {
-            min = root->id;
+            min = root->id+1;
             InsertToBalance(root->right, min, max, file);
         }
     }
@@ -149,23 +152,22 @@ void TaoFileID(int number=5)
     ofstream file("key2.txt");
     file << 1 << endl;
     for (int i = 1; i <= pow(2, n) - 1; i++)
-        InsertToBalance(root, 1, pow(2, n), file); // lay can duoi
+        InsertToBalance(root, 1, pow(2,n)-1, file); // lay can duoi
     file.close();
 }
 int ReadID()
 {
     int number, temp = 1;
     fstream docID("key2.txt", ios::in | ios::out);
-    docID.seekg(ios::beg);
     docID >> number;
     for (int i = 1; i <= number; i++)
     {
         docID >> temp;
     }
     docID.close();
-    ofstream a("key2.txt",ios::in);
+    ofstream a("key2.txt",ios::in|ios::out);
     number++;
-    docID << number;
+    a << number;
     a.close();
     return temp;
 }
@@ -272,7 +274,7 @@ node *convert(Array<node *> &a, int min, int max)
 }
 node *balance(node *root)
 {
-    Array<node *> a;
+    Array<node *> a(pow(2,14));
     Intraversal(a, root);
     node *root1;
     root1 = convert(a, 0, a.GetIndexLast());
@@ -309,8 +311,7 @@ node *origintree(node *p)
     fstream docID("key2.txt", ios::in | ios::out);
     docID.seekg(ios::beg);
     docID >> number;
-    vector<node *> a(pow(2,14));
-    number=pow(2,14);
+    vector<node *> a(number);
     for (int i = 1; i < number; i++)//(N(2+log2(N)))
     {
         docID >> temp;
@@ -380,37 +381,31 @@ void SaveKEY(node *root)
         a << temp->key << endl;
     }
 }
-#include<time.h>
+
 int main()
 {
-    clock_t start, end;   // Khai báo biến thời gian
-    double time_use;
-    int number=7;
+    int number=4;
     TaoFileID(number);
-    int id;
+    node *tree=NULL;
+    for(int i=1;i<pow(2,number);i++)insertnode(tree,ReadID());
+    printTree(tree);
+    cout<<endl;
+    delAll(tree);
+    cin.ignore();
     node *root = NULL;
-    start = clock();
+    //TaoFileID(number);
     for (int i = 1; i < pow(2,number); i++)
     {
-     
-        
-        insertnode(root, i);
-        ReadID();
+        insertnode(root,ReadID());
     }
-    if(isBalanced(root))cout<<"\ncay can bang";
-    else cout<<"cay ko can bang";
-    end = clock(); 
-    cout<<endl;
-    time_use = (double)(end - start) / CLOCKS_PER_SEC;    //Tính thời gian sử dụng
-    cout<<"Thoi gian chay factorial(n): "<<time_use<<endl;
-    cout<<"////////////////////////////////////////////////\n";
-    start = clock();
-    root=origintree(root);
-    end = clock(); 
-    cout<<endl;
-    time_use = (double)(end - start) / CLOCKS_PER_SEC;    //Tính thời gian sử dụng
-    cout<<"Thoi gian chay factorial(n): "<<time_use<<'\n';
+    // root=balance(root);//giả sử file old id đã hết file
+    // //quá trình thêm nếu ko phục hồi cây
+    // for (int i = 0; i < 10; i++)
+    // {
+    //     insertnode(root,ReadID());
+    // }
+    if(isBalanced(root))cout<<"cay can bang\n";
+    else cout<<"cay khong can bang"<<endl;
     printTree(root);
-    if(isBalanced(root))cout<<"\ncay can bang";
     delAll(root);
 }

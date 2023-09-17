@@ -152,48 +152,35 @@ void PreOrder2(node* root)
 {
     node* stack[10],*p=root;
     int sp=-1,x;
-    while(1)
+    while(p!=NULL)
     {
-        while(p!=NULL)
-        {
-            stack[++sp]=p;
-            cout<<p->key<<" ";
-            p=p->left;
-        }
-        
-        while(sp>=0)
-        {
-            p=stack[sp--];
-            if(p->right!=NULL)
-            {   
-                p=p->right;
-                break;
-            }
-            if(sp==-1)return;//doc het roi
-        }
+        cout<<p->key<<" ";
+        if(p->right!=NULL)stack[++sp]=p->right;
+        if(p->left!=NULL)p=p->left;
+        else if(sp!=-1)p=stack[sp--];
+        else break;
     }
 }
 void InOrder1(node* root)
 {
-    node* stack[10];
+    if(root==NULL)return ;
+    node*stack[10],*run=root;
     int sp=-1;
-    node*p=root;
-    while(p!=NULL)
+    do
     {
-        stack[++sp]=p;
-        p=p->left;
-    }
-    while(sp!=-1)
-    {
-        p=stack[sp--];
-        cout<<p->key<<" ";
-        p=p->right;
-        while(p!=NULL)
+        while(run!=NULL)
         {
-            stack[++sp]=p;
-            p=p->left;
+            stack[++sp]=run;
+            run=run->left;
         }
-    }
+        if(sp!=-1)
+        {
+            run=stack[sp--];
+            cout<<run->key<<" ";
+            run=run->right;
+        }else break;
+
+    }while(1);
 }
 void InOrder2(node*root)
 {
@@ -287,9 +274,9 @@ int main(){
     Insert(tree,6,10);
     Insert(tree,5,10);
     Insert(tree,7,10);
-    PostOrder1(tree);
+    PreOrder1(tree);
     cout<<'\n';
-    PostOrder2(tree);
+    PreOrder2(tree);
     releasememory(tree);
     return 0;
 }
